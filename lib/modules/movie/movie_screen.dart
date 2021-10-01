@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/cubit/cubit.dart';
 import 'package:movies_app/models/movies_model.dart';
 import 'package:movies_app/models/search_model.dart';
 import 'package:movies_app/shared/components/constants.dart';
@@ -7,8 +8,27 @@ class MovieScreen extends StatelessWidget {
   MovieScreen({Key? key, this.movie, this.searchMovie}) : super(key: key);
   Results? movie;
   SearchResults? searchMovie;
+  List<String> categories = [];
   @override
   Widget build(BuildContext context) {
+    if (movie != null) {
+      for (var element in AppCubit.get(context).genresModel!.genres) {
+        for (var movieElement in movie!.genreIds) {
+          if (movieElement == element.id) {
+            categories.add(element.name.toString());
+          }
+        }
+      }
+    } else {
+      for (var element in AppCubit.get(context).genresModel!.genres) {
+        for (var movieElement in searchMovie!.genreIds) {
+          if (movieElement == element.id) {
+            categories.add(element.name.toString());
+          }
+        }
+      }
+    }
+    // print(categories);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -19,29 +39,29 @@ class MovieScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: EdgeInsets.all(
-          MediaQuery.of(context).size.height / 50.0,
+          MediaQuery.of(context).size.height / 30.0,
         ),
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              Align(
-                alignment: AlignmentDirectional.center,
-                child: Container(
-                  height: MediaQuery.of(context).size.height / 2,
-                  child: Card(
-                    elevation: 10.0,
-                    child: Image(
-                      image: NetworkImage(
-                        movie != null
-                            ? '$imageLink${movie!.posterPath.toString()}'
-                            : '$imageLink${searchMovie!.posterPath.toString()}',
-                      ),
-                    ),
-                  ),
+              Container(
+                width: double.infinity,
+                child: Card(
                   clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30.0),
+                  elevation: 20.0,
+                  child: Image(
+                    image: NetworkImage(
+                      movie != null
+                          ? '$imageLink${movie!.backdropPath.toString()}'
+                          : '$imageLink${searchMovie!.backdropPath.toString()}',
+                    ),
+                    width: double.infinity,
                   ),
+                ),
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15.0),
                 ),
               ),
               SizedBox(
@@ -78,6 +98,20 @@ class MovieScreen extends StatelessWidget {
                           movie != null
                               ? movie!.releaseDate.toString()
                               : searchMovie!.releaseDate.toString(),
+                          maxLines: 2,
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                color: Colors.grey[300],
+                                height: 1.5,
+                              ),
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height / 80.0,
+                        ),
+                        Text(
+                          categories
+                              .toString()
+                              .replaceAll('[', '')
+                              .replaceAll(']', ''),
                           maxLines: 2,
                           style: Theme.of(context).textTheme.caption!.copyWith(
                                 color: Colors.grey[300],

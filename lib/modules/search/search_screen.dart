@@ -17,7 +17,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   var formKey = GlobalKey<FormState>();
-
+  int page = 1;
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppStates>(
@@ -51,46 +51,88 @@ class _SearchScreenState extends State<SearchScreen> {
                         controller: AppCubit.get(context).searchController,
                         onChange: (String value) {
                           if (value != '') {
-                            AppCubit.get(context).getSearchInfo(text: value);
+                            page = 1;
+                            AppCubit.get(context).getSearchInfo(
+                              text: value,
+                              page: page,
+                            );
                           }
                         },
                         onSubmit: (String value) {
                           if (value != '') {
-                            AppCubit.get(context).getSearchInfo(text: value);
+                            page = 1;
+                            AppCubit.get(context).getSearchInfo(
+                              text: value,
+                              page: page,
+                            );
                           }
                         },
                       ),
                     ),
-                    if(AppCubit.get(context).searchModel != null)
-                    Conditional.single(
-                      context: context,
-                      conditionBuilder: (BuildContext context) =>
-                          AppCubit.get(context).searchModel != null &&
-                          state is! GetSearchDataLoadingState,
-                      widgetBuilder: (BuildContext context) {
-                        return ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: EdgeInsets.all(
-                              MediaQuery.of(context).size.height / 80.0),
-                          itemBuilder: (BuildContext context, int index) {
-                            return buildMovieCard(
-                                context: context,
-                                results: AppCubit.get(context)
-                                    .searchModel!
-                                    .results[index]);
-                          },
-                          separatorBuilder: (BuildContext context, int index) =>
-                              const Divider(),
-                          itemCount:
-                              AppCubit.get(context).searchModel!.results.length,
-                        );
-                      },
-                      fallbackBuilder: (BuildContext context) => Center(
-                          child: CircularProgressIndicator(
-                        color: Colors.grey[300],
-                      )),
-                    ),
+                    if (AppCubit.get(context).searchModel != null)
+                      Conditional.single(
+                        context: context,
+                        conditionBuilder: (BuildContext context) =>
+                            AppCubit.get(context).searchModel != null &&
+                            state is! GetSearchDataLoadingState,
+                        widgetBuilder: (BuildContext context) {
+                          return ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.all(
+                                MediaQuery.of(context).size.height / 80.0),
+                            itemBuilder: (BuildContext context, int index) {
+                              return buildMovieCard(
+                                  context: context,
+                                  results: AppCubit.get(context)
+                                      .searchModel!
+                                      .results[index]);
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                                    const Divider(),
+                            itemCount: AppCubit.get(context)
+                                .searchModel!
+                                .results
+                                .length,
+                          );
+                        },
+                        fallbackBuilder: (BuildContext context) => Center(
+                            child: CircularProgressIndicator(
+                          color: Colors.grey[300],
+                        )),
+                      ),
+                    if (AppCubit.get(context).searchModel != null &&
+                        state is! GetSearchDataLoadingState)
+                      defaultPageNumberRow(
+                        context: context,
+                        page: page,
+                        totalPages:
+                            AppCubit.get(context).searchModel!.totalPages,
+                        onBackPressed: () {
+                          setState(() {
+                            page -= 1;
+                            AppCubit.get(context).getSearchInfo(
+                                text:
+                                    AppCubit.get(context).searchController.text,
+                                page: page);
+                          });
+                        },
+                        onNextPressed: () {
+                          setState(() {
+                            page += 1;
+                            AppCubit.get(context).getSearchInfo(
+                                text:
+                                    AppCubit.get(context).searchController.text,
+                                page: page);
+                          });
+                        },
+                      ),
+                    if (AppCubit.get(context).searchModel != null &&
+                        state is! GetSearchDataLoadingState)
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height / 80.0,
+                      ),
                   ],
                 ),
               ),
@@ -117,7 +159,7 @@ class _SearchScreenState extends State<SearchScreen> {
           );
         },
         child: Container(
-          height: MediaQuery.of(context).size.height / 5.0,
+          height: MediaQuery.of(context).size.height / 4.0,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25.0),
@@ -138,7 +180,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     // height: MediaQuery.of(context).size.height / 5.0,
                   ),
-                  height: MediaQuery.of(context).size.height / 5.0,
+                  height: MediaQuery.of(context).size.height / 4.0,
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -160,6 +202,16 @@ class _SearchScreenState extends State<SearchScreen> {
                         style: Theme.of(context).textTheme.headline6!.copyWith(
                               color: Colors.white,
                               height: 1.5,
+                            ),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height / 80.0,
+                      ),
+                      Text(
+                        'Date : ${results.releaseDate.toString()}',
+                        style: Theme.of(context).textTheme.caption!.copyWith(
+                              height: 0.5,
+                              color: Colors.grey[400],
                             ),
                       ),
                       SizedBox(

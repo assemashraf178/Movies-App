@@ -25,7 +25,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => AppCubit()..getMoviesInfo(),
+      create: (BuildContext context) => AppCubit()
+        ..getGenresMoviesInfo()
+        ..getUpcomingMoviesInfo(page: 1)
+        ..getNowPlayingMoviesInfo(page: 1)
+        ..getPopularMoviesInfo(page: 1)
+        ..getTopRatedMoviesInfo(page: 1),
       child: BlocConsumer<AppCubit, AppStates>(
         listener: (BuildContext context, AppStates state) {},
         builder: (BuildContext context, AppStates state) {
@@ -33,7 +38,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Movies App',
             theme: lightMode(),
-            home: const HomeLayout(),
+            home: HomeLayout(),
           );
         },
       ),

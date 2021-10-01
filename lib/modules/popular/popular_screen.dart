@@ -7,32 +7,32 @@ import 'package:movies_app/models/movies_model.dart';
 import 'package:movies_app/modules/movie/movie_screen.dart';
 import 'package:movies_app/shared/components/constants.dart';
 
-class UpcommingScreen extends StatefulWidget {
-  const UpcommingScreen({Key? key}) : super(key: key);
+class PopularScreen extends StatefulWidget {
+  const PopularScreen({Key? key}) : super(key: key);
 
   @override
-  State<UpcommingScreen> createState() => _UpcommingScreenState();
+  State<PopularScreen> createState() => _PopularScreenState();
 }
 
-class _UpcommingScreenState extends State<UpcommingScreen> {
+class _PopularScreenState extends State<PopularScreen> {
   int page = 1;
   @override
   Widget build(BuildContext context) {
     print(page);
-    AppCubit.get(context).getUpcommingMoviesInfo(page: page);
+    AppCubit.get(context).getPopularMoviesInfo(page: page);
     return BlocConsumer<AppCubit, AppStates>(
         listener: (BuildContext context, AppStates state) {},
         builder: (BuildContext context, AppStates state) {
           return RefreshIndicator(
             onRefresh: () async {
               return await AppCubit.get(context)
-                  .getUpcommingMoviesInfo(page: page);
+                  .getPopularMoviesInfo(page: page);
             },
             child: Conditional.single(
               context: context,
               conditionBuilder: (BuildContext context) =>
-                  AppCubit.get(context).upcommingMoviesModel != null &&
-                  state is! GetUpcommingMoviesDataLoadingState,
+                  AppCubit.get(context).popularMoviesModel != null &&
+                  state is! GetPopularMoviesDataLoadingState,
               widgetBuilder: (BuildContext context) {
                 return SingleChildScrollView(
                   child: Padding(
@@ -47,7 +47,7 @@ class _UpcommingScreenState extends State<UpcommingScreen> {
                             return buildMovieCard(
                                 context: context,
                                 results: AppCubit.get(context)
-                                    .upcommingMoviesModel!
+                                    .popularMoviesModel!
                                     .results[index]);
                           },
                           separatorBuilder: (BuildContext context, int index) =>
@@ -55,7 +55,7 @@ class _UpcommingScreenState extends State<UpcommingScreen> {
                             height: MediaQuery.of(context).size.height / 50.0,
                           ),
                           itemCount: AppCubit.get(context)
-                              .upcommingMoviesModel!
+                              .popularMoviesModel!
                               .results
                               .length,
                         ),
@@ -66,14 +66,14 @@ class _UpcommingScreenState extends State<UpcommingScreen> {
                           children: [
                             if (page <=
                                     AppCubit.get(context)
-                                        .upcommingMoviesModel!
+                                        .popularMoviesModel!
                                         .totalPages &&
                                 page != 1)
                               FloatingActionButton(
                                 onPressed: () {
                                   if (page <
                                       AppCubit.get(context)
-                                          .upcommingMoviesModel!
+                                          .popularMoviesModel!
                                           .totalPages) {
                                     setState(() {
                                       page -= 1;
@@ -101,13 +101,13 @@ class _UpcommingScreenState extends State<UpcommingScreen> {
                             const Spacer(),
                             if (page <
                                 AppCubit.get(context)
-                                    .upcommingMoviesModel!
+                                    .popularMoviesModel!
                                     .totalPages)
                               FloatingActionButton(
                                 onPressed: () {
                                   if (page <
                                       AppCubit.get(context)
-                                          .upcommingMoviesModel!
+                                          .popularMoviesModel!
                                           .totalPages) {
                                     setState(() {
                                       page += 1;
